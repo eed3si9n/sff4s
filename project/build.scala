@@ -15,6 +15,7 @@ object Builds extends Build {
     libraryDependencies ++= Seq(
       "org.specs2" %% "specs2" % "1.5" % "test"
     ),
+    scalacOptions += "-unchecked",
     publishArtifact in (Compile, packageBin) := true,
     publishArtifact in (Test, packageBin) := false,
     publishArtifact in (Compile, packageDoc) := false,
