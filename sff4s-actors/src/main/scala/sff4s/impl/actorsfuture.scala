@@ -17,20 +17,17 @@ class WrappedActorsFuture[A](val underlying: scala.actors.Future[Either[Throwabl
       case e: Throwable => Left(e)
     }
     
-  def get(timeoutInMsec: Long): Either[Throwable, A] = {
-    val x = scala.actors.Futures.awaitAll(timeoutInMsec, underlying).head
-    x match {
-      case Some(value) => value.asInstanceOf[Either[Throwable, A]]
+  def get(timeoutInMsec: Long): Either[Throwable, A] =
+    scala.actors.Futures.awaitAll(timeoutInMsec, underlying).head match {
+      case Some(value) =>
+        try {
+          value.asInstanceOf[Either[Throwable, A]]  
+        }
+        catch {
+          case e: Throwable => Left(e)
+        }
       case None => Left(new TimeoutException(timeoutInMsec))
     }
-  }
     
   def isDefined = underlying.isSet
-}
-
-class WrappedActorsThrowable[A](val underlying: Throwable) extends Future[A] {
-  val factory = ActorsFuture
-  def get: Either[Throwable, A] = Left(underlying)
-  def get(timeoutInMsec: Long): Either[Throwable, A] = get
-  def isDefined = true 
 }

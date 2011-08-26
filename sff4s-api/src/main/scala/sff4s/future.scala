@@ -5,10 +5,6 @@ trait Futures {
   def futureEither[A](result: => Either[Throwable, A]): Future[A]
 }
 
-object Future {
-  val DEFAULT_TIMEOUT: Long = -1
-}
-
 /**
  * A computation evaluated asynchronously.
  * Much of the code taken from https://github.com/twitter/util/blob/master/util-core/src/main/scala/com/twitter/util/Future.scala.
