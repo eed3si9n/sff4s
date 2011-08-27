@@ -3,8 +3,11 @@ package sff4s.impl
 import sff4s._
 
 object ActorsFuture extends Futures {
+  implicit def toFuture[A](underlying: scala.actors.Future[Either[Throwable, A]]): Future[A] =
+    new WrappedActorsFuture(underlying)  
+  
   def futureEither[A](result: => Either[Throwable, A]): Future[A] =
-    new WrappedActorsFuture(scala.actors.Futures future { result })
+    scala.actors.Futures future { result }
 }
 
 class WrappedActorsFuture[A](val underlying: scala.actors.Future[Either[Throwable, A]]) extends Future[A] {
