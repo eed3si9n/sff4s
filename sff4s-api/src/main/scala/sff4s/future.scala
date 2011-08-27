@@ -23,6 +23,14 @@ abstract class Future[+A] {
   def apply(timeoutInMsec: Long): A = get(timeoutInMsec).fold(throw _, x => x)
   
   /**
+   * The contained value of this Future. Before this Future is completed the value will be None.
+   * After completion the value will be Some(Right(t)) if it contains a valid result, or Some(Left(error)) if it contains an exception.
+   */
+  def value : Option[Either[Throwable, A]] =
+    if (isDefined) Some(get)
+    else None
+  
+  /**
    * Demands that the result of the future be available, and blocks indefinitly.
    */
   def get: Either[Throwable, A]

@@ -6,7 +6,7 @@ object BuildSettings {
   val buildSettings = Defaults.defaultSettings ++ Seq(
     version := "0.1.0-SNAPSHOT",
     organization := "com.eed3si9n",
-    scalaVersion := "2.8.1",
+    scalaVersion := "2.9.0-1",
     crossScalaVersions := Seq("2.9.0-1", "2.8.1"),
     libraryDependencies ++= Seq(
       "org.specs2" %% "specs2" % "1.5" % "test"
@@ -30,13 +30,22 @@ object Builds extends Build {
   import Keys._
   import BuildSettings._
   
-	lazy val root = Project("root", file("."), settings = buildSettings) aggregate(api, actors, juc, twitter)
+	lazy val root = Project("root", file("."), settings = buildSettings) aggregate(api, actors, juc, akka)
 	
 	lazy val api = Project("sff4s-api", file("sff4s-api"), settings = buildSettings)
 	lazy val actors = Project("sff4s-actors", file("sff4s-actors"), settings = buildSettings) dependsOn(api % "compile;test->test")
 	lazy val juc = Project("sff4s-juc", file("sff4s-juc"), settings = buildSettings) dependsOn(api % "compile;test->test")
+	
+	lazy val akka = Project("sff4s-akka", file("sff4s-akka"),
+	  settings = buildSettings ++ Seq(
+	    resolvers += "Akka Repo" at "http://akka.io/repository",
+	    libraryDependencies += "se.scalablesolutions.akka" % "akka-actor" % "1.1.3"
+	  )) dependsOn(api % "compile;test->test")
+	  
 	lazy val twitter = Project("sff4s-twitter-util", file("sff4s-twitter-util"),
 	  settings = buildSettings ++ Seq(
+	    scalaVersion := "2.8.1",
+      crossScalaVersions := Seq("2.8.1"),
 	    resolvers += "twttr.com Repo" at "http://maven.twttr.com",
 	    libraryDependencies += "com.twitter" % "util-core" % "1.11.4"
 	  )) dependsOn(api % "compile;test->test")
