@@ -34,18 +34,18 @@ class WrappedTwitterUtilFuture[A](val underlying: ctu.Future[A]) extends Future[
   
   val factory = TwitterUtilFuture
   
-  def get: Either[Throwable, A] =
-    tryToEither(underlying.get(ctu.Future.DEFAULT_TIMEOUT))
+  def get: Either[Throwable, A] = get(ctu.Future.DEFAULT_TIMEOUT)
   
   def get(timeoutInMsec: Long): Either[Throwable, A] =
-    tryToEither(underlying.get(timeoutInMsec.milliseconds))
-  
-  private def tryToEither(value: Try[A]): Either[Throwable, A] =
-    value match {
-      case Throw(e) => Left(e)
-      case Return(value) => Right(value.asInstanceOf[A])
+    underlying.get(timeoutInMsec.milliseconds) match {
+      case Throw(e) =>
+        e match {
+          case e: ctu.TimeoutException => Left(TimeoutException(timeoutInMsec)) 
+          case _ => Left(e)
+        }
+      case Return(value) => Right(value.asInstanceOf[A])      
     }
-  
+    
   def isDefined = underlying.isDefined
   
   // short-curcuit to underlying implementations

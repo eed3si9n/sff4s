@@ -98,5 +98,5 @@ abstract class Future[+A] {
   def isDefined: Boolean
 }
 
-case class TimeoutException(val timeoutInMsec: Long) extends Exception(timeoutInMsec.toString)
+case class TimeoutException(timeoutInMsec: Long) extends Exception(timeoutInMsec.toString)
 case class PredicateException() extends Exception()

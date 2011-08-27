@@ -29,7 +29,7 @@ class WrappedActorsFuture[A](val underlying: scala.actors.Future[Either[Throwabl
         catch {
           case e: Throwable => Left(e)
         }
-      case None => Left(new TimeoutException(timeoutInMsec))
+      case None => Left(TimeoutException(timeoutInMsec))
     }
     
   def isDefined = underlying.isSet
