@@ -1,5 +1,8 @@
 package sff4s
 
+/**
+ * The parent trait for factory object. 
+ */
 trait Futures {
   def future[A](result: => A): Future[A] = futureEither(Right(result))
   def futureEither[A](result: => Either[Throwable, A]): Future[A]
@@ -98,7 +101,29 @@ abstract class Future[+A] {
     respond {
       case Left(e) => rescueException(e)
       case _ =>
-    }    
+    }
+  
+  /**
+   * Choose the first Future to succeed.
+   *
+   * @param other another Future
+   * @return a new Future whose result is that of the first of this and other to return
+   */
+  def select[U >: A](other: Future[U]): Future[U]
+  
+  /**
+   * A synonym for select(): Choose the first Future to succeed.
+   */
+  def or[U >: A](other: Future[U]): Future[U] = select(other)
+  
+  /**
+   * Combines two Futures into one Future of the Tuple of the two results.
+   */
+  def join[B](other: Future[B]): Future[(A, B)] =
+    factory.futureEither {
+      get fold (Left(_), va =>
+        other.get fold(Left(_), vb => Right(va, vb)))
+    }
   
   /**
    * Is the result of the Future available yet?
@@ -108,3 +133,5 @@ abstract class Future[+A] {
 
 case class TimeoutException(timeoutInMsec: Long) extends Exception(timeoutInMsec.toString)
 case class PredicateException() extends Exception()
+case class UnsupportedException() extends Exception()
+case class IncompatibleFutureException() extends Exception()

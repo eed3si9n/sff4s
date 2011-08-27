@@ -13,6 +13,9 @@ object AkkaFuture extends Futures {
     toFuture(ad.Future(result) flatMap { new ad.AlreadyCompletedFuture(_) })
 }
 
+/**
+ * https://github.com/jboner/akka/blob/master/akka-actor/src/main/scala/akka/dispatch/Future.scala
+ */
 class WrappedAkkaFuture[A](val underlying: ad.Future[A]) extends Future[A] {
   import AkkaFuture.toFuture
   
@@ -30,6 +33,15 @@ class WrappedAkkaFuture[A](val underlying: ad.Future[A]) extends Future[A] {
       case e: Throwable => Left(e)
     }
     
+  def select[U >: A](other: Future[U]): Future[U] =
+    ad.Futures.firstCompletedOf(Seq(underlying, toNative(other)))
+      
+  private def toNative[U](other: Future[U]): ad.Future[U] =
+    other match {
+      case other: WrappedAkkaFuture[_] => other.underlying.asInstanceOf[ad.Future[U]]
+      case _ => throw IncompatibleFutureException()
+    }
+  
   def isDefined = underlying.isCompleted
   
   // short-curcuit to underlying implementations

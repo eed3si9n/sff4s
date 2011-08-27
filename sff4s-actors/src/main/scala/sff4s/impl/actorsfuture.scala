@@ -31,6 +31,15 @@ class WrappedActorsFuture[A](val underlying: scala.actors.Future[Either[Throwabl
         }
       case None => Left(TimeoutException(timeoutInMsec))
     }
-    
+
+  def select[U >: A](other: Future[U]): Future[U] =
+    factory.futureEither { scala.actors.Futures.awaitEither(underlying, toNative(other)) }
+  
+  private def toNative[U](other: Future[U]): scala.actors.Future[Either[Throwable, U]] =
+    other match {
+      case other: WrappedActorsFuture[_] => other.underlying.asInstanceOf[scala.actors.Future[Either[Throwable, U]]]
+      case _ => throw IncompatibleFutureException()
+    }
+            
   def isDefined = underlying.isSet
 }

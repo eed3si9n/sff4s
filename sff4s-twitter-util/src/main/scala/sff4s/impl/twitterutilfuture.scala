@@ -48,6 +48,12 @@ class WrappedTwitterUtilFuture[A](val underlying: ctu.Future[A]) extends Future[
     
   def isDefined = underlying.isDefined
   
+  private def toNative[U](other: Future[U]): ctu.Future[U] =
+    other match {
+      case other: WrappedTwitterUtilFuture[_] => other.underlying.asInstanceOf[ctu.Future[U]]
+      case _ => throw IncompatibleFutureException()
+    }
+  
   // short-curcuit to underlying implementations
   override def apply() = underlying.apply()
   override def apply(timeoutInMsec: Long) = underlying.apply(timeoutInMsec.milliseconds)
@@ -62,4 +68,6 @@ class WrappedTwitterUtilFuture[A](val underlying: ctu.Future[A]) extends Future[
   override def onSuccess(f: A => Unit): Future[A] = underlying.onSuccess(f)
   override def onFailure(rescueException: Throwable => Unit): Future[A] =
     underlying.onFailure(rescueException)
+  def select[U >: A](other: Future[U]): Future[U] = underlying.select(toNative(other))
+  override def join[B](other: Future[B]): Future[(A, B)] = underlying.join(toNative(other))
 }
