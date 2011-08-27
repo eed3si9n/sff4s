@@ -28,7 +28,7 @@ trait FutureSpec extends Specification {
   def factory: Futures
   def future: Future[Int] =
     factory future {
-      Thread.sleep(500)
+      Thread.sleep(100)
       1
     }
   def mapped =
