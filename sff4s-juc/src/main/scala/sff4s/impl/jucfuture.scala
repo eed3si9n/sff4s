@@ -10,10 +10,17 @@ object JucSingleThreadExecutorFuture extends JucFuture(
   juc.Executors.newSingleThreadExecutor)
 
 class JucFuture(val executor: juc.ExecutorService) extends Futures { self =>
-  implicit def toFuture[A](underlying: juc.Future[Either[Throwable, A]]): Future[A] =
-    new WrappedJucFuture(underlying)  
+  implicit def toFuture[A](underlying: juc.Future[A]): Future[A] =
+    future { underlying() }
   
-  def futureEither[A](result: => Either[Throwable, A]): Future[A] = executor.submit(toCallable(result))
+  def futureEither[A](result: => Either[Throwable, A]): Future[A] =
+    new WrappedJucFuture(executor.submit(toCallable(
+      try {
+        result
+      }
+      catch {
+        case e: Throwable => Left(e)
+      })))
   
   private def toCallable[U](result: => U): juc.Callable[U] = new juc.Callable[U] { def call: U = result }
     

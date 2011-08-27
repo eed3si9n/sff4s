@@ -8,6 +8,9 @@ class TwitterUtilFutureSpec extends FutureSpec { def is =
   "The sample future should"                                                  ^
     "behave like a future"                                                    ^ isFuture(future, 1)^
                                                                               endp^
+  "The bad future should"                                                     ^
+    "behave like a bad future"                                                ^ isBadFuture(bad, future)^
+                                                                              endp^
   "The chained future should"                                                 ^
     "behave like a future"                                                    ^ isFuture(mapped, 2)^
                                                                               end

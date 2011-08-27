@@ -38,6 +38,8 @@ object Builds extends Build {
 	
 	lazy val akka = Project("sff4s-akka", file("sff4s-akka"),
 	  settings = buildSettings ++ Seq(
+	    scalaVersion := "2.9.0-1",
+      crossScalaVersions := Seq("2.9.0-1"),
 	    resolvers += "Akka Repo" at "http://akka.io/repository",
 	    libraryDependencies += "se.scalablesolutions.akka" % "akka-actor" % "1.1.3"
 	  )) dependsOn(api % "compile;test->test")

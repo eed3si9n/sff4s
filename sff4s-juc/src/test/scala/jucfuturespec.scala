@@ -9,6 +9,9 @@ class JucFutureSpec extends FutureSpec { def is =
     "behave like a future"                                                    ^ isFuture(future, 1)^
     "behave like an async calc"                                               ^ isAsync(future)^
                                                                               endp^
+  "The bad future should"                                                     ^
+    "behave like a bad future"                                                ^ isBadFuture(bad, future)^
+                                                                              endp^                                                                      
   "The chained future should"                                                 ^
     "behave like a future"                                                    ^ isFuture(mapped, 2)^
     "behave like an async calc"                                               ^ isAsync(mapped)^

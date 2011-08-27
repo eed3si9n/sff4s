@@ -25,6 +25,15 @@ trait FutureSpec extends Specification {
     def e3 = v(50) must throwA[TimeoutException]
   }
   
+  def isBadFuture(z: => Future[Int], v: => Future[Int]) =
+    "eventually evaluate to an error state"                                   ! B(z, v).e1^
+    "short circuit mapped future to an error state"                           ! B(z, v).e2
+    
+  case class B(z: Future[Int], v: Future[Int]) {
+    def e1 = z.get must beLeft
+    def e2 = (z map {1+}).get must beLeft
+  }
+  
   def factory: Futures
   def future: Future[Int] =
     factory future {
@@ -35,5 +44,9 @@ trait FutureSpec extends Specification {
     future map { result =>
       Thread.sleep(100)
       result + 1
+    }
+  def bad: Future[Int] =
+    factory future {
+      (1 / 0) + 1
     }
 }
