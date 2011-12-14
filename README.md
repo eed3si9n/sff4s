@@ -3,6 +3,12 @@ sff4s
 
 sff4s (simple future facade for Scala) is a Scala wrapper around several future implementations.
 
+```scala
+libraryDependencies ++= Seq(
+  "com.eed3si9n" %% "sff4s-api" % "0.1.0",
+  "com.eed3si9n" %% "sff4s-juc" % "0.1.0")
+```
+
 The API mostly mimics that of twitter util's [`Future`][1]:
 
 ```scala
