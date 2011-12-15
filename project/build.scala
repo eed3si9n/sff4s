@@ -7,7 +7,7 @@ object BuildSettings {
     version := "0.1.0",
     organization := "com.eed3si9n",
     scalaVersion := "2.9.1",
-    crossScalaVersions := Seq("2.9.1"),
+    crossScalaVersions := Seq("2.8.1", "2.9.1"),
     libraryDependencies ++= Seq(
       "org.specs2" %% "specs2" % "1.5" % "test"
     ),
@@ -23,7 +23,7 @@ object BuildSettings {
       else Some("Scala Tools Nexus" at nexus + "releases/")
     },
     credentials += Credentials(Path.userHome / ".ivy2" / ".credentials")
-  )  
+  )
 }
 
 object Builds extends Build {
@@ -32,7 +32,7 @@ object Builds extends Build {
   
 	lazy val root = Project("root", file("."), settings = buildSettings ++ Seq(
 	    publish := {}
-	  )) aggregate(api, actors, juc, akka, twitter)
+	  )) aggregate(api, actors, juc, twitter)
 	
 	lazy val api = Project("sff4s-api", file("sff4s-api"), settings = buildSettings)
 	lazy val actors = Project("sff4s-actors", file("sff4s-actors"), settings = buildSettings) dependsOn(api % "compile;test->test")
@@ -41,12 +41,18 @@ object Builds extends Build {
 	lazy val akka = Project("sff4s-akka", file("sff4s-akka"),
 	  settings = buildSettings ++ Seq(
 	    resolvers += "Akka Repo" at "http://akka.io/repository",
-	    libraryDependencies += "se.scalablesolutions.akka" % "akka-actor" % "1.2"
+	    libraryDependencies <+= (scalaVersion) { (sv) => sv match {
+	      case "2.9.1" => "se.scalablesolutions.akka" % "akka-actor" % "1.2"
+	      case "2.8.1" => "se.scalablesolutions.akka" % "akka-actor" % "1.0"
+	    }}
 	  )) dependsOn(api % "compile;test->test")
 	  
 	lazy val twitter = Project("sff4s-twitter-util", file("sff4s-twitter-util"),
 	  settings = buildSettings ++ Seq(
 	    resolvers += "twttr.com Repo" at "http://maven.twttr.com",
-	    libraryDependencies += "com.twitter" %% "util-core" % "1.12.8"
+	    libraryDependencies <+= (scalaVersion) { (sv) => sv match {
+	      case "2.9.1" => "com.twitter" %% "util-core" % "1.12.8"
+	      case "2.8.1" => "com.twitter" % "util-core" % "1.12.7"
+	    }}
 	  )) dependsOn(api % "compile;test->test")
 }
