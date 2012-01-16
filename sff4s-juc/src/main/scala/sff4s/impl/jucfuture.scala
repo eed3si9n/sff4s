@@ -11,7 +11,7 @@ object JucSingleThreadExecutorFuture extends JucFuture(
 
 class JucFuture(val executor: juc.ExecutorService) extends Futures { self =>
   implicit def toFuture[A](underlying: juc.Future[A]): Future[A] =
-    future { underlying() }
+    future { underlying.get() }
   
   def futureEither[A](result: => Either[Throwable, A]): Future[A] =
     new WrappedJucFuture(executor.submit(toCallable(
