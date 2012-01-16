@@ -49,4 +49,5 @@ trait FutureSpec extends Specification {
     factory future {
       (1 / 0) + 1
     }
+  def converted: Future[Int]
 }
