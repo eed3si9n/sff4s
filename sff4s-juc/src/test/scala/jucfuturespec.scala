@@ -1,6 +1,6 @@
 import org.specs2._
 
-import sff4s.Futures
+import sff4s.{Future, Futures}
 
 class JucFutureSpec extends FutureSpec { def is =
   "This is a specification to check a juc future"                             ^
@@ -15,7 +15,19 @@ class JucFutureSpec extends FutureSpec { def is =
   "The chained future should"                                                 ^
     "behave like a future"                                                    ^ isFuture(mapped, 2)^
     "behave like an async calc"                                               ^ isAsync(mapped)^
+                                                                              endp^                                                                      
+  "The converted future should"                                               ^
+    "behave like a future"                                                    ^ isFuture(converted, 3)^
+    "behave like an async calc"                                               ^ isAsync(converted)^
                                                                               end
   
   def factory: Futures = sff4s.impl.JucSingleThreadExecutorFuture
+  def converted: Future[Int] = {
+    import java.util.concurrent.{FutureTask, Callable, Executors}
+    val poolSize = 10
+    val executor = Executors.newFixedThreadPool(poolSize)
+    val jucFuture = executor.submit(new Callable[Int]() { def call(): Int = { Thread.sleep(100); 3 } })
+    val factory = new sff4s.impl.JucFixedThreadPoolFuture(poolSize)
+    factory toFuture(jucFuture)
+  }
 }
