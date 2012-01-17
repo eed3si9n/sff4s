@@ -2,8 +2,9 @@ import sbt._
 
 object BuildSettings {
   import Keys._
+  import ls.Plugin.LsKeys._
   
-  val buildSettings = Defaults.defaultSettings ++ Seq(
+  lazy val buildSettings = Defaults.defaultSettings ++ customLsSettings ++ Seq(
     version := "0.1.1",
     organization := "com.eed3si9n",
     scalaVersion := "2.9.1",
@@ -24,18 +25,26 @@ object BuildSettings {
     },
     credentials += Credentials(Path.userHome / ".ivy2" / ".credentials")
   )
+  
+  lazy val customLsSettings = _root_.ls.Plugin.lsSettings ++ Seq(
+    tags in lsync := Seq("future")
+  )
 }
 
 object Builds extends Build {
   import Keys._
   import BuildSettings._
+  import ls.Plugin.LsKeys._
   
 	lazy val root = Project("root", file("."), settings = buildSettings ++ Seq(
 	    name := "sff4s",
-	    publish := {}
+	    publish := {},
+	    writeVersion := {}
 	  )) aggregate(api, actors, juc, twitter)
 	
-	lazy val api = Project("sff4s-api", file("sff4s-api"), settings = buildSettings)
+	lazy val api = Project("sff4s-api", file("sff4s-api"), settings = buildSettings ++ Seq(
+	    description := "wrapper around several future implementations"
+	  ))
 	lazy val actors = Project("sff4s-actors", file("sff4s-actors"), settings = buildSettings) dependsOn(api % "compile;test->test")
 	lazy val juc = Project("sff4s-juc", file("sff4s-juc"), settings = buildSettings) dependsOn(api % "compile;test->test")
 	
