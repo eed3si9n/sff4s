@@ -1,0 +1,6 @@
+## bug fix
+
+- Fixes impicitly converted `juc.Future` getting stuck. [#2][#2] fixed by [@seratch][@seratch]
+
+  [#2]: https://github.com/eed3si9n/sff4s/pull/2
+  [@seratch]: https://github.com/seratch

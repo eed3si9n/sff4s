@@ -1,0 +1,4 @@
+## initial release
+
+- Defines future API roughly based on twitter's future.
+- Wraps `juc.Future`, `actors.Future`, `akka.dispatch.Future`, and `com.twitter.util.Future`.

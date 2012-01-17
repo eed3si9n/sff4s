@@ -4,7 +4,7 @@ object BuildSettings {
   import Keys._
   
   val buildSettings = Defaults.defaultSettings ++ Seq(
-    version := "0.1.0",
+    version := "0.1.1",
     organization := "com.eed3si9n",
     scalaVersion := "2.9.1",
     crossScalaVersions := Seq("2.8.1", "2.9.1"),
@@ -31,6 +31,7 @@ object Builds extends Build {
   import BuildSettings._
   
 	lazy val root = Project("root", file("."), settings = buildSettings ++ Seq(
+	    name := "sff4s",
 	    publish := {}
 	  )) aggregate(api, actors, juc, twitter)
 	
